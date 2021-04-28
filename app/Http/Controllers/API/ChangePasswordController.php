@@ -1,0 +1,152 @@
+<?php
+
+namespace App\Http\Controllers\API;
+
+use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Validator;
+use App\User;
+use DB;
+use Mail;
+class ChangePasswordController extends Controller
+{
+    public function change_profile(Request $request)
+    {
+        try {
+            $user = Auth::user();
+
+            $user->name = $request->name;
+            $user->phone = $request->phone;
+            $user->pin = $request->pin;
+            $user->update();
+            $success['name'] = $user['name'];
+            $success['phone'] = $user['phone'];
+            $success['pin'] = $user['pin'];
+
+            return response()->json([
+                'status' => 'True',
+                'message' => 'Profile Updated',
+                'data' => $success,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'status' => 'False',
+                'message' => $e->getMessage(),
+                'data' => [],
+            ]);
+        }
+    }
+
+    public function forgot_password(Request $request)
+    {
+        try {
+            $email = $request->email;
+            $user = DB::Table('users')
+                ->select('name')
+                ->where('email', $email)
+                ->get();
+
+            if (sizeof($user) != 0) {
+                $pass_random = rand(1111, 9999);
+                $data = ['Password' => $pass_random, 'user_email' => $email];
+                User::where('email', $email)->update([
+                    'password' => Hash::make($pass_random),
+                ]);
+
+                Mail::send('mail', $data, function ($message) use ($email) {
+                    $message
+                        ->to($email, 'Stocard User')
+                        ->subject('Forgot Password Information');
+                    $message->from('stocard@gmail.com', 'Stocard Owner');
+                });
+            } else {
+                return $this->sendError(
+                    'Email Id Not Found',
+                    'Check your Mail-ID'
+                );
+            }
+            return $this->sendResponse(
+                'Check Your Mail',
+                'Password has sent to your Email'
+            );
+        } catch (\Exception $e) {
+            return response()->json(
+                [
+                    'status' => 'False',
+                    'message' => $e->getMessage(),
+                    'data' => [],
+                ],
+                500
+            );
+        }
+    }
+
+    public function change_password(Request $request)
+    {
+        $input = $request->all();
+        $userid = Auth::guard('api')->user()->id;
+        $rules = [
+            'old_password' => 'required',
+            'new_password' => 'required',
+            'confirm_password' => 'required|same:new_password',
+        ];
+        $validator = Validator::make($input, $rules);
+        if ($validator->fails()) {
+            $arr = [
+                'status' => true,
+                'message' => $validator->errors()->first(),
+            ];
+        } else {
+            try {
+                if (
+                    Hash::check(
+                        request('old_password'),
+                        Auth::user()->password
+                    ) == false
+                ) {
+                    $arr = [
+                        'status' => false,
+                        'message' => 'Check your old password.',
+                    ];
+                } elseif (
+                    Hash::check(
+                        request('new_password'),
+                        Auth::user()->password
+                    ) == true
+                ) {
+                    $arr = [
+                        'status' => false,
+                        'message' =>
+                            'Please enter a password which is not similar then currunt password.',
+                    ];
+                } else {
+                    User::where('id', $userid)->update([
+                        'password' => Hash::make($input['new_password']),
+                    ]);
+                    $arr = [
+                        'status' => true,
+                        'message' => 'Password updated Successfully',
+                    ];
+                    return response()->json([
+                        'status' => true,
+                        'message' => 'Changed Password Successfully',
+                    ]);
+                }
+            } catch (\Exception $e) {
+                if (isset($e->errorInfo[2])) {
+                    $msg = $e->errorInfo[2];
+                } else {
+                    $msg = $e->getMessage();
+                }
+                $arr = ['status' => false, 'message' => $msg];
+                return response()->json([
+                    'status' => false,
+                    'message' => $arr,
+                ]);
+            }
+        }
+        return $this->sendError('Unaurthorized.', ['error' => 'Unaurthorized']);
+    }
+}
