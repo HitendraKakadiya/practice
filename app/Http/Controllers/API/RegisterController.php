@@ -26,8 +26,8 @@ class RegisterController extends Controller
         }
         $image = $request->file('user_img');
         $new_name = rand() . '.' . $image->getClientOriginalExtension();
-        $image->move(public_path('/images/user_img'), $new_name);
-        $path = 'http://192.168.43.133:8000/images/user_img/';
+        $image->move(public_path('/upload/user_img'), $new_name);
+        $path = 'http://stocard.project-demo.info/upload/user_img/';
         $path .= $new_name;
 
         $input = $request->all();
