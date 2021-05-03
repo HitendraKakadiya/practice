@@ -47,7 +47,7 @@ class StoreCardController extends Controller
             $success['Card_Reward_Per'] = $user->rewardpercen;
             $success['Card_no'] = $user->cardno;
             $success['Card_detail'] = $user->carddetail;
-            $success['Card_Image'] = $user->card_img;
+            $success['Image'] = $user->card_img;
             $success['Card_Expdate'] = $user->expdate;
 
             return $this->sendResponse($success, 'Card Added Successfully');

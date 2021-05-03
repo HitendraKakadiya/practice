@@ -41,11 +41,10 @@ class StoreController extends Controller
             $input['store_img'] = $path;
             $input['user_id'] = Auth::guard('api')->user()->id;
             $user = storedata::create($input);
-            $success['id'] = $user->id;
             $success['stname'] = $user->stname;
             $success['stlocation'] = $user->stlocation;
             $success['stcontact'] = $user->stcontact;
-            $success['store_img'] = $user->store_img;
+            $success['Image'] = $user->store_img;
 
             return $this->sendResponse($success, 'Store Add Successfully');
         } catch (\Exception $e) {

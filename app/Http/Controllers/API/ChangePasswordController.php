@@ -10,20 +10,34 @@ use Validator;
 use App\User;
 use DB;
 use Mail;
+use File;
 class ChangePasswordController extends Controller
 {
     public function change_profile(Request $request)
     {
         try {
             $user = Auth::user();
+            $old_image = str_replace(
+                'http://stocard.project-demo.info/upload/user_img/',
+                '',
+                $user['user_img']
+            );
+            File::delete(public_path('upload/user_img/' . $old_image));
+            $image = $request->file('image');
+            $new_name = rand() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('/upload/user_img'), $new_name);
+            $path = 'http://stocard.project-demo.info/upload/user_img/';
+            $path .= $new_name;
 
             $user->name = $request->name;
             $user->phone = $request->phone;
             $user->pin = $request->pin;
+            $user->user_img = $path;
             $user->update();
             $success['name'] = $user['name'];
             $success['phone'] = $user['phone'];
             $success['pin'] = $user['pin'];
+            $success['Image'] = $user['user_img'];
 
             return response()->json([
                 'status' => 'True',
