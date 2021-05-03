@@ -7,6 +7,7 @@ use App\storedata;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use DB;
+use File;
 
 class StoreController extends Controller
 {
@@ -28,8 +29,12 @@ class StoreController extends Controller
 
             $image = $request->file('store_img');
             $new_name = rand() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('/images/store_img'), $new_name);
-            $path = 'http://192.168.43.133:8000/images/store_img/';
+            $path = public_path() . '/upload/store_img';
+            if (!File::isDirectory($path)) {
+                File::makeDirectory($path, 0777, true, true);
+            }
+            $image->move(public_path('/upload/store_img'), $new_name);
+            $path = 'http://stocard.project-demo.info/upload/store_img/';
             $path .= $new_name;
 
             $input = $request->all();

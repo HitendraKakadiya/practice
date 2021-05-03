@@ -8,6 +8,7 @@ use App\User;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use App\Http\Controllers\BaseController;
+use File;
 
 class RegisterController extends Controller
 {
@@ -26,6 +27,10 @@ class RegisterController extends Controller
         }
         $image = $request->file('user_img');
         $new_name = rand() . '.' . $image->getClientOriginalExtension();
+        $path = public_path() . '/upload/user_img';
+        if (!File::isDirectory($path)) {
+            File::makeDirectory($path, 0777, true, true);
+        }
         $image->move(public_path('/upload/user_img'), $new_name);
         $path = 'http://stocard.project-demo.info/upload/user_img/';
         $path .= $new_name;
@@ -58,6 +63,7 @@ class RegisterController extends Controller
             $success['email'] = $user->email;
             $success['pin'] = $user->pin;
             $success['phone'] = $user->phone;
+            $success['Image'] = $user->user_img;
             return $this->sendResponse($success, 'User login successfully.');
         } else {
             return $this->sendError('Unauthorised.', [

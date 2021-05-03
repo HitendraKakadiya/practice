@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Validator;
 use DB;
+use File;
 
 class StoreCardController extends Controller
 {
@@ -29,8 +30,12 @@ class StoreCardController extends Controller
 
             $image = $request->file('card_img');
             $new_name = rand() . '.' . $image->getClientOriginalExtension();
-            $image->move(public_path('/images/card_img'), $new_name);
-            $path = 'http://192.168.43.133:8000/images/card_img/';
+            $path = public_path() . '/upload/card_img';
+            if (!File::isDirectory($path)) {
+                File::makeDirectory($path, 0777, true, true);
+            }
+            $image->move(public_path('/upload/card_img'), $new_name);
+            $path = 'http://stocard.project-demo.info/upload/card_img/';
             $path .= $new_name;
 
             $input = $request->all();
