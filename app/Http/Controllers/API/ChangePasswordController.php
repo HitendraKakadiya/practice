@@ -16,6 +16,20 @@ class ChangePasswordController extends Controller
     public function change_profile(Request $request)
     {
         try {
+            $validator = Validator::make($request->all(), [
+                'name' => 'required',
+                'phone' => 'required | min:10 | max:10',
+                'pin' => 'required | min:4 | max:4',
+                'user_img' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError(
+                    'Validation Error.',
+                    $validator->errors()
+                );
+            }
+
             $user = Auth::user();
             $old_image = str_replace(
                 'http://stocard.project-demo.info/upload/user_img/',
@@ -23,7 +37,7 @@ class ChangePasswordController extends Controller
                 $user['user_img']
             );
             File::delete(public_path('upload/user_img/' . $old_image));
-            $image = $request->file('image');
+            $image = $request->file('user_img');
             $new_name = rand() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('/upload/user_img'), $new_name);
             $path = 'http://stocard.project-demo.info/upload/user_img/';

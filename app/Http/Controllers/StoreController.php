@@ -17,7 +17,8 @@ class StoreController extends Controller
             $validator = Validator::make($request->all(), [
                 'stname' => 'required',
                 'stlocation' => 'required',
-                'stcontact' => 'required',
+                'stcontact' => 'required|min:10|max:10',
+                'store_img' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             ]);
 
             if ($validator->fails()) {

@@ -19,6 +19,7 @@ class StoreCardController extends Controller
                 'rewardpercen' => 'required',
                 'carddetail' => 'required',
                 'expdate' => 'required',
+                'card_img' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             ]);
 
             if ($validator->fails()) {

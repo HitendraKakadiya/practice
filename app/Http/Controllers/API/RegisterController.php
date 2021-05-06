@@ -20,6 +20,7 @@ class RegisterController extends Controller
             'password' => 'required',
             'phone' => 'required | min:10 | max:10',
             'pin' => 'required | min:4 | max:4',
+            'user_img' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
         ]);
 
         if ($validator->fails()) {
