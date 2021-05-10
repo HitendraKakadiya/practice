@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\RegisterController;
 use App\Http\Controllers\API\ChangePasswordController;
 use App\Http\Controllers\StoreController;
+use App\Http\Controllers\CardShareController;
 use App\Http\Controllers\StoreCardController;
 /*
 |--------------------------------------------------------------------------
@@ -43,6 +44,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('CardDelete', 'StoreCardController@card_delete');
 
     Route::post('ChangeProfile', 'API\ChangePasswordController@change_profile');
+    Route::post('ShareCode', 'CardShareController@random_code');
     Route::post(
         'ChangePassword',
         'API\ChangePasswordController@change_password'
