@@ -39,14 +39,21 @@ Route::group(['middleware' => 'auth:api'], function () {
         'StoreDetail'
     );
     Route::post('StoreDelete', 'StoreController@store_delete');
+
     Route::post('StoreCard', 'StoreCardController@store_card');
     Route::post('CardDetail', 'StoreCardController@card_details');
     Route::post('CardDelete', 'StoreCardController@card_delete');
+    Route::post('HideCard', 'StoreCardController@hide_card');
+    Route::post('ShowCard', 'StoreCardController@show_card');
+
+    Route::post('StoreSuggest', 'StoreSuggestionController@index');
 
     Route::post('ChangeProfile', 'API\ChangePasswordController@change_profile');
-    Route::post('ShareCode', 'CardShareController@random_code');
     Route::post(
         'ChangePassword',
         'API\ChangePasswordController@change_password'
     );
+
+    Route::post('ShareCode', 'CardShareController@random_code');
+    Route::post('AddShareCard', 'CardShareController@add_share_card');
 });

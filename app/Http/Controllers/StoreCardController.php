@@ -70,15 +70,17 @@ class StoreCardController extends Controller
                     'cardno',
                     'expdate',
                     'carddetail',
-                    'card_img'
+                    'card_img',
+                    'status'
                 )
                 ->where('user_id', $id)
                 ->where('st_id', $aa)
+                ->where('status', 'show')
                 ->get();
 
             return $this->sendResponse($user, 'Selected Card Detail');
         } catch (\Exception $e) {
-            return $this->sendError('Error', $e->sendMessage());
+            return $this->sendError('Error', $e->getMessage());
         }
     }
 
@@ -98,5 +100,57 @@ class StoreCardController extends Controller
             ];
         }
         return response()->json($data);
+    }
+
+    public function hide_card(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'card_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validator Error.', $validator->errors());
+        }
+        $card_id = $request->input('card_id');
+        $card_data = storecard::where('id', $card_id)->get();
+        if ($card_data[0]['status'] == 'show') {
+            $update = storecard::where('id', $card_id)->update([
+                'status' => 'hide',
+            ]);
+            $card_data = storecard::where('id', $card_id)->get();
+            $success['id'] = $card_data[0]['id'];
+            $success['status'] = $card_data[0]['status'];
+
+            if ($update) {
+                return $this->sendResponse($success, 'Card Hide Successfully.');
+            } else {
+                return $this->sendError(
+                    'Card does not Hide because of some Error.',
+                    ['Error' => 'Operation Failed']
+                );
+            }
+        } else {
+            $success['id'] = $card_data[0]['id'];
+            $success['status'] = $card_data[0]['status'];
+            return $this->sendError(
+                'Card already hide you can not hide it again!!!',
+                $success
+            );
+        }
+    }
+
+    public function show_card(Request $request)
+    {
+        $update = storecard::where('status', 'hide')->update([
+            'status' => 'show',
+        ]);
+        $success = $update . ' record Updated';
+        if ($update) {
+            return $this->sendResponse($success, 'Card Show Successfully.');
+        } else {
+            return $this->sendError('All card Already in Show mode.', [
+                'Error' => 'Operation Failed',
+            ]);
+        }
     }
 }

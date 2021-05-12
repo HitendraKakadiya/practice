@@ -16,5 +16,6 @@ class storecard extends Model
         'rewardpercen',
         'expdate',
         'card_img',
+        'status',
     ];
 }
