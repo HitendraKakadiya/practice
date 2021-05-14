@@ -23,6 +23,7 @@ class User extends Authenticatable
         'phone',
         'pin',
         'user_img',
+        'device_id',
     ];
 
     /**

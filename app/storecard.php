@@ -17,5 +17,6 @@ class storecard extends Model
         'expdate',
         'card_img',
         'status',
+        'isActive',
     ];
 }

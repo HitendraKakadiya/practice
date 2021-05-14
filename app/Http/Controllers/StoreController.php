@@ -61,6 +61,7 @@ class StoreController extends Controller
             $user = DB::Table('storedatas')
                 ->select('id', 'stname', 'stlocation', 'stcontact', 'store_img')
                 ->where('user_id', $id)
+                ->orderBy('stname')
                 ->get();
 
             return $this->sendResponse($user, 'List of Stores');
@@ -77,6 +78,7 @@ class StoreController extends Controller
             $data = DB::table('storedatas')
                 ->select('id', 'stname', 'user_id', 'stlocation', 'stcontact')
                 ->where('user_id', $id)
+                ->orderBy('stname')
                 ->get();
 
             return $this->sendResponse($data, 'Selected Store Data');

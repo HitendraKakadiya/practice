@@ -21,6 +21,7 @@ class RegisterController extends Controller
             'phone' => 'required | min:10 | max:10',
             'pin' => 'required | min:4 | max:4',
             'user_img' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
+            'device_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -40,12 +41,14 @@ class RegisterController extends Controller
         $input['user_img'] = $path;
         $input['password'] = bcrypt($input['password']);
         $user = User::create($input);
+        $success['id'] = $user->id;
         $success['token'] = $user->createToken('MyApp')->accessToken;
         $success['name'] = $user->name;
         $success['email'] = $user->email;
         $success['pin'] = $user->pin;
         $success['phone'] = $user->phone;
         $success['Image'] = $user->user_img;
+        $success['device_id'] = $user->device_id;
 
         return $this->sendResponse($success, 'User register successfully.');
     }
@@ -58,13 +61,28 @@ class RegisterController extends Controller
                 'password' => $request->password,
             ])
         ) {
+            $validator = Validator::make($request->all(), [
+                'device_id' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return $this->sendError(
+                    'Validation Error.',
+                    $validator->errors()
+                );
+            }
+
+            User::where('id', Auth::user()->id)->update([
+                'device_id' => $request->device_id,
+            ]);
             $user = Auth::user();
+            $success['id'] = $user->id;
             $success['token'] = $user->createToken('MyApp')->accessToken;
             $success['name'] = $user->name;
             $success['email'] = $user->email;
             $success['pin'] = $user->pin;
             $success['phone'] = $user->phone;
             $success['Image'] = $user->user_img;
+            $success['deviec_id'] = $request->device_id;
             return $this->sendResponse($success, 'User login successfully.');
         } else {
             return $this->sendError('Unauthorised.', [
