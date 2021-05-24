@@ -14,7 +14,12 @@ class StoreSuggestionController extends Controller
      */
     public function index()
     {
-        $store = storedata::all('stname', 'store_img');
+        $store = storedata::all(
+            'stname',
+            'store_img',
+            'stlocation',
+            'stcontact'
+        );
         $storeUnique = $store->unique('stname');
         $storeUnique->limit = null;
         $success = $storeUnique->splice(0);

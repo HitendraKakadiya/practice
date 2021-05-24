@@ -58,11 +58,35 @@ class StoreController extends Controller
         try {
             $id = Auth::guard('api')->user()->id;
 
-            $user = DB::Table('storedatas')
-                ->select('id', 'stname', 'stlocation', 'stcontact', 'store_img')
+            $favorite = DB::Table('storedatas')
+                ->select(
+                    'id',
+                    'stname',
+                    'stlocation',
+                    'stcontact',
+                    'store_img',
+                    'is_favorite'
+                )
                 ->where('user_id', $id)
+                ->where('is_favorite', 'true')
                 ->orderBy('stname')
                 ->get();
+
+            $un_favorite = DB::Table('storedatas')
+                ->select(
+                    'id',
+                    'stname',
+                    'stlocation',
+                    'stcontact',
+                    'store_img',
+                    'is_favorite'
+                )
+                ->where('user_id', $id)
+                ->where('is_favorite', 'false')
+                ->orderBy('stname')
+                ->get();
+            $merged = $favorite->merge($un_favorite);
+            $user = $merged->all();
 
             return $this->sendResponse($user, 'List of Stores');
         } catch (\Exception $e) {
@@ -76,7 +100,14 @@ class StoreController extends Controller
             $id = Auth::guard('api')->user()->id;
             $stid = $request->stid;
             $data = DB::table('storedatas')
-                ->select('id', 'stname', 'user_id', 'stlocation', 'stcontact')
+                ->select(
+                    'id',
+                    'stname',
+                    'user_id',
+                    'stlocation',
+                    'stcontact',
+                    'is_favorite'
+                )
                 ->where('user_id', $id)
                 ->orderBy('stname')
                 ->get();
@@ -104,5 +135,91 @@ class StoreController extends Controller
             ];
         }
         return response()->json($data);
+    }
+    public function add_favorite(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'store_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validator Error.', $validator->errors());
+        }
+        $store_id = $request->input('store_id');
+        $store_data = storedata::where('id', $store_id)->get();
+        if ($store_data[0]['is_favorite'] == 'false') {
+            $update = storedata::where('id', $store_id)->update([
+                'is_favorite' => 'true',
+            ]);
+            $store_data = storedata::where('id', $store_id)->get();
+            $success['id'] = $store_data[0]['id'];
+            $success['is_favorite'] = $store_data[0]['is_favorite'];
+
+            if ($update) {
+                return $this->sendResponse(
+                    $success,
+                    'Store Add to Favorite Successfully.'
+                );
+            } else {
+                return $this->sendError(
+                    'Store does not add to Favorite because of some Error.',
+                    ['Error' => 'Operation Failed']
+                );
+            }
+        } else {
+            $success['id'] = $store_data[0]['id'];
+            $success['is_favorite'] = $store_data[0]['is_favorite'];
+            return $this->sendError(
+                'Store already in Favorite, you can not add it again!!!',
+                $success
+            );
+        }
+    }
+
+    public function remove_favorite(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'store_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Validator Error.', $validator->errors());
+        }
+        $store_id = $request->input('store_id');
+        $store_data = storedata::where('id', $store_id)->get();
+        if (!$store_data->isEmpty()) {
+            if ($store_data[0]['is_favorite'] == 'true') {
+                $update = storedata::where('id', $store_id)->update([
+                    'is_favorite' => 'false',
+                ]);
+                $store_data = storedata::where('id', $store_id)->get();
+                $success['id'] = $store_data[0]['id'];
+                $success['is_favorite'] = $store_data[0]['is_favorite'];
+
+                if ($update) {
+                    return $this->sendResponse(
+                        $success,
+                        'Store Remove from Favorite Successfully.'
+                    );
+                } else {
+                    return $this->sendError(
+                        'Store does not remove from favorite because of some Error.',
+                        ['Error' => 'Operation Failed']
+                    );
+                }
+            } else {
+                $success['id'] = $store_data[0]['id'];
+                $success['is_favorite'] = $store_data[0]['is_favorite'];
+                return $this->sendError(
+                    'Store already in favorite mode!!!',
+                    $success
+                );
+            }
+        }
+        return $this->sendError(
+            'Card ' . $card_id . ' Does not Exist. Please Check Again!!!',
+            [
+                'Error' => 'Operation Failed',
+            ]
+        );
     }
 }

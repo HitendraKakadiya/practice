@@ -86,7 +86,8 @@ class RegisterController extends Controller
             return $this->sendResponse($success, 'User login successfully.');
         } else {
             return $this->sendError('Unauthorised.', [
-                'error' => 'Unauthorised',
+                'error' =>
+                    'Email and Password are not Valid. Please Check Again!!!',
             ]);
         }
     }

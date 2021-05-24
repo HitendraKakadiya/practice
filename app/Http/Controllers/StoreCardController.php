@@ -200,20 +200,5 @@ class StoreCardController extends Controller
                 'Error' => 'Operation Failed',
             ]
         );
-
-        //     if ($validator->fails()) {
-        //         return $this->sendError('Validator Error.', $validator->errors());
-        //     }
-        //     $update = storecard::where('status', 'hide')->update([
-        //         'status' => 'show',
-        //     ]);
-        //     $success = $update . ' record Updated';
-        //     if ($update) {
-        //         return $this->sendResponse($success, 'Card Show Successfully.');
-        //     } else {
-        //         return $this->sendError('All card Already in Show mode.', [
-        //             'Error' => 'Operation Failed',
-        //         ]);
-        //     }
     }
 }

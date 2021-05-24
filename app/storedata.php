@@ -13,5 +13,6 @@ class storedata extends Model
         'stlocation',
         'stcontact',
         'store_img',
+        'is_favorite',
     ];
 }

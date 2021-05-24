@@ -39,6 +39,8 @@ Route::group(['middleware' => 'auth:api'], function () {
         'StoreDetail'
     );
     Route::post('StoreDelete', 'StoreController@store_delete');
+    Route::post('AddFavorite', 'StoreController@add_favorite');
+    Route::post('RemoveFavorite', 'StoreController@remove_favorite');
 
     Route::post('StoreCard', 'StoreCardController@store_card');
     Route::post('CardDetail', 'StoreCardController@card_details');
