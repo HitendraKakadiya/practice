@@ -134,6 +134,7 @@ class StoreCardController extends Controller
             $update = storecard::where('id', $card_id)->update([
                 'status' => 'hide',
             ]);
+            $card_data = storecard::where('id', $card_id)->first();
             $success['id'] = $card_data['id'];
             $success['status'] = $card_data['status'];
 
