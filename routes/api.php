@@ -19,6 +19,11 @@ use App\Http\Controllers\StoreCardController;
 */
 
 Route::post('Forgot_Password', 'API\ChangePasswordController@forgot_password');
+Route::post('OTP_Verify', 'API\ChangePasswordController@otp_verify');
+Route::post(
+    'Create_New_Password',
+    'API\ChangePasswordController@create_new_password'
+);
 
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();

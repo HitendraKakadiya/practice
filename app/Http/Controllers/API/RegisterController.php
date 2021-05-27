@@ -50,7 +50,7 @@ class RegisterController extends Controller
         $success['Image'] = $user->user_img;
         $success['device_id'] = $user->device_id;
 
-        return $this->sendResponse($success, 'User register successfully.');
+        return $this->sendResponse('User register successfully.', $success);
     }
 
     public function login(Request $request)
@@ -83,7 +83,7 @@ class RegisterController extends Controller
             $success['phone'] = $user->phone;
             $success['Image'] = $user->user_img;
             $success['deviec_id'] = $request->device_id;
-            return $this->sendResponse($success, 'User login successfully.');
+            return $this->sendResponse('User login successfully.', $success);
         } else {
             return $this->sendError('Unauthorised.', [
                 'error' =>

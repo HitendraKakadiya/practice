@@ -47,7 +47,8 @@
                                         <p style="color:#455056; font-size:15px;line-height:24px; margin:0;">
                                             We cannot simply send you your old password. A unique number to reset your
                                             password has been generated for you. To reset your password, enter the
-                                            following code and follow the instructions.
+                                            following code and follow the instructions. <b>This unique number is valid only 
+                                            for 15 min so be quick. </b>
                                         </p>
                                         <a href="javascript:void(0);"
                                             style="background:#20e277;text-decoration:none !important; font-weight:500; margin-top:35px; color:#fff;text-transform:uppercase; font-size:14px;padding:10px 24px;display:inline-block;border-radius:50px;" disabled>{{ $Password }}</a>

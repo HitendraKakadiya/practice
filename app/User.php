@@ -27,6 +27,8 @@ class User extends Authenticatable
         'pin',
         'user_img',
         'device_id',
+        'OTP',
+        'otpExpTime',
     ];
 
     /**

@@ -30,7 +30,7 @@ class CardShareController extends Controller
         foreach ($card as $item) {
             $date2 = $item['exptime'];
             if ($date1 >= $date2) {
-                dd(CardShare::where('exptime', $date2)->delete());
+                CardShare::where('exptime', $date2)->delete();
             }
         }
         try {
@@ -46,7 +46,7 @@ class CardShareController extends Controller
             }
             $user_id = Auth::guard('api')->user()->id;
             $card_id = $request->input('card_id');
-            $card_data = storecard::where('id', $card_id)->get();
+            $card_data = storecard::where('id', $card_id)->first();
             if (!$card_data->isEmpty()) {
                 $random = Str::random(6);
 
@@ -62,8 +62,8 @@ class CardShareController extends Controller
                 $success['share_code'] = $data['share_code'];
                 $success['exptime'] = $data['exptime'];
                 return $this->sendResponse(
-                    $success,
-                    'Code Generated Successfully. This code is Expire in 12 hours.'
+                    'Code Generated Successfully. This code is Expire in 12 hours.',
+                    $success
                 );
             } else {
                 return $this->sendError('Card Not Found');
@@ -92,30 +92,30 @@ class CardShareController extends Controller
         }
         $user_id = Auth::guard('api')->user()->id;
         $share_code = $request->input('share_code');
-        $card = CardShare::where('share_code', $share_code)->get();
+        $card = CardShare::where('share_code', $share_code)->first();
         if (!$card->isEmpty()) {
-            $card_id = $card[0]['card_id'];
-            $card_data = storecard::where('id', $card_id)->get();
+            $card_id = $card['card_id'];
+            $card_data = storecard::where('id', $card_id)->first();
             $available = storecard::where('user_id', $user_id)
-                ->where('cardno', $card_data[0]['cardno'])
-                ->get();
-            $storedata = storedata::where('id', $card_data[0]['st_id'])->get();
-            $store = storedata::where('stname', $storedata[0]['stname'])
+                ->where('cardno', $card_data['cardno'])
+                ->first();
+            $storedata = storedata::where('id', $card_data['st_id'])->first();
+            $store = storedata::where('stname', $storedata['stname'])
                 ->where('user_id', $user_id)
-                ->get();
+                ->first();
         }
         if (!$card->isEmpty()) {
             if (!$store->isEmpty()) {
                 if ($available->isEmpty()) {
                     $data = storecard::create([
                         'user_id' => $user_id,
-                        'st_id' => $store[0]['id'],
-                        'cardname' => $card_data[0]['cardname'],
-                        'cardno' => $card_data[0]['cardno'],
-                        'rewardpercen' => $card_data[0]['rewardpercen'],
-                        'carddetail' => $card_data[0]['carddetail'],
-                        'expdate' => $card_data[0]['expdate'],
-                        'card_img' => $card_data[0]['card_img'],
+                        'st_id' => $store['id'],
+                        'cardname' => $card_data['cardname'],
+                        'cardno' => $card_data['cardno'],
+                        'rewardpercen' => $card_data['rewardpercen'],
+                        'carddetail' => $card_data['carddetail'],
+                        'expdate' => $card_data['expdate'],
+                        'card_img' => $card_data['card_img'],
                     ]);
                     $success['st_id'] = $data['st_id'];
                     $success['cardname'] = $data['cardname'];
@@ -126,18 +126,17 @@ class CardShareController extends Controller
                     $success['card_img'] = $data['card_img'];
 
                     return $this->sendResponse(
-                        $success,
                         'Shared Card Added Successfully.',
-                        ['Error' => 'Operation Failed']
+                        $success
                     );
                 }
-                $fail['cardname'] = $available[0]['cardname'];
-                $fail['cardno'] = $available[0]['cardno'];
+                $fail['cardname'] = $available['cardname'];
+                $fail['cardno'] = $available['cardno'];
                 return $this->sendError('Card is Already Exist', $fail);
             }
             return $this->sendError(
                 'Store ' .
-                    $storedata[0]['stname'] .
+                    $storedata['stname'] .
                     ' is Not Available in your account. Please first Add the Store.',
                 ['Error' => 'Operation Failed']
             );

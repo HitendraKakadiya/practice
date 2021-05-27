@@ -24,8 +24,8 @@ class StoreSuggestionController extends Controller
         $storeUnique->limit = null;
         $success = $storeUnique->splice(0);
         return $this->sendResponse(
-            $success,
-            'Select any Store if you want to insert it.'
+            'Select any Store if you want to insert it.',
+            $success
         );
     }
 

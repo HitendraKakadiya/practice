@@ -11,6 +11,8 @@ use App\User;
 use DB;
 use Mail;
 use File;
+use Carbon\Carbon;
+
 class ChangePasswordController extends Controller
 {
     public function change_profile(Request $request)
@@ -69,6 +71,17 @@ class ChangePasswordController extends Controller
 
     public function forgot_password(Request $request)
     {
+        $date1 = Carbon::now()->toDateTimeString();
+        $user = User::all();
+        foreach ($user as $item) {
+            $date2 = $item['otpExpTime'];
+            if ($date1 >= $date2) {
+                User::where('otpExpTime', $date2)->update([
+                    'OTP' => null,
+                    'otpExpTime' => null,
+                ]);
+            }
+        }
         try {
             $email = $request->email;
             $user = DB::Table('users')
@@ -80,7 +93,10 @@ class ChangePasswordController extends Controller
                 $pass_random = rand(1111, 9999);
                 $data = ['Password' => $pass_random, 'user_email' => $email];
                 User::where('email', $email)->update([
-                    'password' => Hash::make($pass_random),
+                    'OTP' => $pass_random,
+                    'otpExpTime' => Carbon::now()
+                        ->addMinutes(15)
+                        ->toDateTimeString(),
                 ]);
 
                 Mail::send('mail', $data, function ($message) use ($email) {
@@ -91,13 +107,13 @@ class ChangePasswordController extends Controller
                 });
             } else {
                 return $this->sendError(
-                    'Email Id Not Found',
-                    'Check your Mail-ID'
+                    'Check your Mail-ID',
+                    'Email Id Not Found'
                 );
             }
             return $this->sendResponse(
-                'Check Your Mail',
-                'Password has sent to your Email'
+                'Password has sent to your Email',
+                'Check Your Mail'
             );
         } catch (\Exception $e) {
             return response()->json(
@@ -118,7 +134,6 @@ class ChangePasswordController extends Controller
         $rules = [
             'old_password' => 'required',
             'new_password' => 'required',
-            'confirm_password' => 'required|same:new_password',
         ];
         $validator = Validator::make($input, $rules);
         if ($validator->fails()) {
@@ -153,10 +168,6 @@ class ChangePasswordController extends Controller
                     User::where('id', $userid)->update([
                         'password' => Hash::make($input['new_password']),
                     ]);
-                    $arr = [
-                        'status' => true,
-                        'message' => 'Password updated Successfully',
-                    ];
                     return response()->json([
                         'status' => true,
                         'message' => 'Changed Password Successfully',
@@ -175,6 +186,86 @@ class ChangePasswordController extends Controller
                 ]);
             }
         }
-        return $this->sendError('Unaurthorized.', ['error' => 'Unaurthorized']);
+        return $this->sendError(
+            'You are not a register User so please Register or check your Credentials!!!.'
+        );
+    }
+
+    public function otp_verify(Request $request)
+    {
+        $date1 = Carbon::now()->toDateTimeString();
+        $user = User::all();
+        foreach ($user as $item) {
+            $date2 = $item['otpExpTime'];
+            if ($date1 >= $date2) {
+                User::where('otpExpTime', $date2)->update([
+                    'OTP' => null,
+                    'otpExpTime' => null,
+                ]);
+            }
+        }
+        $validator = Validator::make($request->all(), [
+            'otp' => 'required',
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors());
+        }
+
+        $otp = $request->otp;
+        $email = $request->email;
+
+        $user = User::where('email', $email)
+            ->where('OTP', $otp)
+            ->first();
+        if (!empty($user)) {
+            return $this->sendResponse('OTP Match Successfully.');
+        } else {
+            return $this->sendError(
+                'Error',
+                'OTP does not match or Expired. Please Check Again!!!'
+            );
+        }
+    }
+
+    public function create_new_password(Request $request)
+    {
+        $date1 = Carbon::now()->toDateTimeString();
+        $user = User::all();
+        foreach ($user as $item) {
+            $date2 = $item['otpExpTime'];
+            if ($date1 >= $date2) {
+                User::where('otpExpTime', $date2)->update([
+                    'OTP' => null,
+                    'otpExpTime' => null,
+                ]);
+            }
+        }
+
+        $validator = Validator::make($request->all(), [
+            'new_password' => 'required',
+            'email' => 'required|email',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->sendError('Validation Error', $validator->errors());
+        }
+
+        $new_password = bcrypt($request->new_password);
+        $email = $request->email;
+
+        $user = User::where('email', $email)->update([
+            'password' => $new_password,
+        ]);
+        if ($user) {
+            User::where('email', $email)->update([
+                'OTP' => null,
+                'otpExpTime' => null,
+            ]);
+            return $this->sendResponse('New Password Change Successfully.');
+        } else {
+            return $this->sendError('Something want Wrong!!!');
+        }
     }
 }

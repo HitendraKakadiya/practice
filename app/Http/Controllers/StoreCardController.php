@@ -56,9 +56,9 @@ class StoreCardController extends Controller
             $success['status'] = $user['status'];
             $success['isActive'] = $user['isActive'];
 
-            return $this->sendResponse($success, 'Card Added Successfully');
+            return $this->sendResponse('Card Added Successfully', $success);
         } catch (\Exception $e) {
-            return $this->sendError('Error', $e->getMessage());
+            return $this->sendError('Error', 'Something want Wrong!!!');
         }
     }
 
@@ -95,7 +95,7 @@ class StoreCardController extends Controller
                 ->orderBy('cardname')
                 ->get();
 
-            return $this->sendResponse($user, 'Selected Card Detail');
+            return $this->sendResponse('Selected Card Detail', $user);
         } catch (\Exception $e) {
             return $this->sendError('Error', $e->getMessage());
         }
@@ -129,27 +129,27 @@ class StoreCardController extends Controller
             return $this->sendError('Validator Error.', $validator->errors());
         }
         $card_id = $request->input('card_id');
-        $card_data = storecard::where('id', $card_id)->get();
-        if ($card_data[0]['status'] == 'show') {
+        $card_data = storecard::where('id', $card_id)->first();
+        if ($card_data['status'] == 'show') {
             $update = storecard::where('id', $card_id)->update([
                 'status' => 'hide',
             ]);
-            $success['id'] = $card_data[0]['id'];
-            $success['status'] = $card_data[0]['status'];
+            $success['id'] = $card_data['id'];
+            $success['status'] = $card_data['status'];
 
             if ($update) {
-                return $this->sendResponse($success, 'Card Hide Successfully.');
+                return $this->sendResponse('Card Lock Successfully.', $success);
             } else {
                 return $this->sendError(
-                    'Card does not Hide because of some Error.',
+                    'Card does not Lock because of some Error.',
                     ['Error' => 'Operation Failed']
                 );
             }
         } else {
-            $success['id'] = $card_data[0]['id'];
-            $success['status'] = $card_data[0]['status'];
+            $success['id'] = $card_data['id'];
+            $success['status'] = $card_data['status'];
             return $this->sendError(
-                'Card already hide you can not hide it again!!!',
+                'Card already Lock you can not hide it again!!!',
                 $success
             );
         }
@@ -164,32 +164,32 @@ class StoreCardController extends Controller
             return $this->sendError('Validator Error.', $validator->errors());
         }
         $card_id = $request->input('card_id');
-        $card_data = storecard::where('id', $card_id)->get();
+        $card_data = storecard::where('id', $card_id)->first();
         if (!$card_data->isEmpty()) {
-            if ($card_data[0]['status'] == 'hide') {
+            if ($card_data['status'] == 'hide') {
                 $update = storecard::where('id', $card_id)->update([
                     'status' => 'show',
                 ]);
-                $card_data = storecard::where('id', $card_id)->get();
-                $success['id'] = $card_data[0]['id'];
-                $success['status'] = $card_data[0]['status'];
+                $card_data = storecard::where('id', $card_id)->first();
+                $success['id'] = $card_data['id'];
+                $success['status'] = $card_data['status'];
 
                 if ($update) {
                     return $this->sendResponse(
-                        $success,
-                        'Card Show Successfully.'
+                        'Card Un-Lock Successfully.',
+                        $success
                     );
                 } else {
                     return $this->sendError(
-                        'Card does not Show because of some Error.',
+                        'Card does not Un-Lock because of some Error.',
                         ['Error' => 'Operation Failed']
                     );
                 }
             } else {
-                $success['id'] = $card_data[0]['id'];
-                $success['status'] = $card_data[0]['status'];
+                $success['id'] = $card_data['id'];
+                $success['status'] = $card_data['status'];
                 return $this->sendError(
-                    'Card already in Show mode!!!',
+                    'Card already in Un-Lock mode!!!',
                     $success
                 );
             }

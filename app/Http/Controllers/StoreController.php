@@ -47,7 +47,7 @@ class StoreController extends Controller
             $success['stcontact'] = $user->stcontact;
             $success['Image'] = $user->store_img;
 
-            return $this->sendResponse($success, 'Store Add Successfully');
+            return $this->sendResponse('Store Add Successfully', $success);
         } catch (\Exception $e) {
             return $this->sendError('Error', $e->getMessage());
         }
@@ -88,7 +88,7 @@ class StoreController extends Controller
             $merged = $favorite->merge($un_favorite);
             $user = $merged->all();
 
-            return $this->sendResponse($user, 'List of Stores');
+            return $this->sendResponse('List of Stores', $user);
         } catch (\Exception $e) {
             return $this->sendError('Error', $e->getMessage());
         }
@@ -112,7 +112,7 @@ class StoreController extends Controller
                 ->orderBy('stname')
                 ->get();
 
-            return $this->sendResponse($data, 'Selected Store Data');
+            return $this->sendResponse('Selected Store Data', $data);
         } catch (\Exception $e) {
             return $this->sendError('Error', $e->getMessage());
         }
@@ -146,19 +146,19 @@ class StoreController extends Controller
             return $this->sendError('Validator Error.', $validator->errors());
         }
         $store_id = $request->input('store_id');
-        $store_data = storedata::where('id', $store_id)->get();
-        if ($store_data[0]['is_favorite'] == 'false') {
+        $store_data = storedata::where('id', $store_id)->first();
+        if ($store_data['is_favorite'] == 'false') {
             $update = storedata::where('id', $store_id)->update([
                 'is_favorite' => 'true',
             ]);
-            $store_data = storedata::where('id', $store_id)->get();
-            $success['id'] = $store_data[0]['id'];
-            $success['is_favorite'] = $store_data[0]['is_favorite'];
+            $store_data = storedata::where('id', $store_id)->first();
+            $success['id'] = $store_data['id'];
+            $success['is_favorite'] = $store_data['is_favorite'];
 
             if ($update) {
                 return $this->sendResponse(
-                    $success,
-                    'Store Add to Favorite Successfully.'
+                    'Store Add to Favorite Successfully.',
+                    $success
                 );
             } else {
                 return $this->sendError(
@@ -167,8 +167,8 @@ class StoreController extends Controller
                 );
             }
         } else {
-            $success['id'] = $store_data[0]['id'];
-            $success['is_favorite'] = $store_data[0]['is_favorite'];
+            $success['id'] = $store_data['id'];
+            $success['is_favorite'] = $store_data['is_favorite'];
             return $this->sendError(
                 'Store already in Favorite, you can not add it again!!!',
                 $success
@@ -185,20 +185,20 @@ class StoreController extends Controller
             return $this->sendError('Validator Error.', $validator->errors());
         }
         $store_id = $request->input('store_id');
-        $store_data = storedata::where('id', $store_id)->get();
+        $store_data = storedata::where('id', $store_id)->first();
         if (!$store_data->isEmpty()) {
-            if ($store_data[0]['is_favorite'] == 'true') {
+            if ($store_data['is_favorite'] == 'true') {
                 $update = storedata::where('id', $store_id)->update([
                     'is_favorite' => 'false',
                 ]);
-                $store_data = storedata::where('id', $store_id)->get();
-                $success['id'] = $store_data[0]['id'];
-                $success['is_favorite'] = $store_data[0]['is_favorite'];
+                $store_data = storedata::where('id', $store_id)->first();
+                $success['id'] = $store_data['id'];
+                $success['is_favorite'] = $store_data['is_favorite'];
 
                 if ($update) {
                     return $this->sendResponse(
-                        $success,
-                        'Store Remove from Favorite Successfully.'
+                        'Store Remove from Favorite Successfully.',
+                        $success
                     );
                 } else {
                     return $this->sendError(
@@ -207,8 +207,8 @@ class StoreController extends Controller
                     );
                 }
             } else {
-                $success['id'] = $store_data[0]['id'];
-                $success['is_favorite'] = $store_data[0]['is_favorite'];
+                $success['id'] = $store_data['id'];
+                $success['is_favorite'] = $store_data['is_favorite'];
                 return $this->sendError(
                     'Store already in favorite mode!!!',
                     $success

@@ -17,6 +17,7 @@
         "laravel/framework": "^7.29",
         "laravel/passport": "^9.4",
         "laravel/tinker": "^2.5",
+        "laravelcollective/html": "^6.2",
         "nwidart/laravel-modules": "7.0"
     },
     "require-dev": {
