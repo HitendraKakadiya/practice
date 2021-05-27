@@ -186,7 +186,7 @@ class StoreController extends Controller
         }
         $store_id = $request->input('store_id');
         $store_data = storedata::where('id', $store_id)->first();
-        if (!$store_data->isEmpty()) {
+        if (!empty($store_data)) {
             if ($store_data['is_favorite'] == 'true') {
                 $update = storedata::where('id', $store_id)->update([
                     'is_favorite' => 'false',

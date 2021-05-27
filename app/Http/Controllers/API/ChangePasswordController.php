@@ -84,9 +84,9 @@ class ChangePasswordController extends Controller
             $user = DB::Table('users')
                 ->select('name')
                 ->where('email', $email)
-                ->first();
+                ->get();
 
-            if (!empty($user)) {
+            if (sizeof($user) != 0) {
                 $pass_random = rand(1111, 9999);
                 $data = ['Password' => $pass_random, 'user_email' => $email];
                 User::where('email', $email)->update([

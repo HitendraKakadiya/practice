@@ -165,7 +165,7 @@ class StoreCardController extends Controller
         }
         $card_id = $request->input('card_id');
         $card_data = storecard::where('id', $card_id)->first();
-        if (!$card_data->isEmpty()) {
+        if (!empty($card_data)) {
             if ($card_data['status'] == 'hide') {
                 $update = storecard::where('id', $card_id)->update([
                     'status' => 'show',

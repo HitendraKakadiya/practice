@@ -47,7 +47,7 @@ class CardShareController extends Controller
             $user_id = Auth::guard('api')->user()->id;
             $card_id = $request->input('card_id');
             $card_data = storecard::where('id', $card_id)->first();
-            if (!$card_data->isEmpty()) {
+            if (!empty($card_data)) {
                 $random = Str::random(6);
 
                 $data = CardShare::create([
@@ -93,7 +93,7 @@ class CardShareController extends Controller
         $user_id = Auth::guard('api')->user()->id;
         $share_code = $request->input('share_code');
         $card = CardShare::where('share_code', $share_code)->first();
-        if (!$card->isEmpty()) {
+        if (!empty($card)) {
             $card_id = $card['card_id'];
             $card_data = storecard::where('id', $card_id)->first();
             $available = storecard::where('user_id', $user_id)
@@ -104,9 +104,9 @@ class CardShareController extends Controller
                 ->where('user_id', $user_id)
                 ->first();
         }
-        if (!$card->isEmpty()) {
-            if (!$store->isEmpty()) {
-                if ($available->isEmpty()) {
+        if (!empty($card)) {
+            if (!empty($store)) {
+                if (empty($available)) {
                     $data = storecard::create([
                         'user_id' => $user_id,
                         'st_id' => $store['id'],
