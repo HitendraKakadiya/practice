@@ -21,7 +21,6 @@ class ChangePasswordController extends Controller
             $validator = Validator::make($request->all(), [
                 'name' => 'required',
                 'phone' => 'required | min:10 | max:10',
-                'pin' => 'required | min:4 | max:4',
                 'user_img' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
             ]);
 
@@ -47,12 +46,10 @@ class ChangePasswordController extends Controller
 
             $user->name = $request->name;
             $user->phone = $request->phone;
-            $user->pin = $request->pin;
             $user->user_img = $path;
             $user->update();
             $success['name'] = $user['name'];
             $success['phone'] = $user['phone'];
-            $success['pin'] = $user['pin'];
             $success['Image'] = $user['user_img'];
 
             return response()->json([
@@ -87,9 +84,9 @@ class ChangePasswordController extends Controller
             $user = DB::Table('users')
                 ->select('name')
                 ->where('email', $email)
-                ->get();
+                ->first();
 
-            if (sizeof($user) != 0) {
+            if (!empty($user)) {
                 $pass_random = rand(1111, 9999);
                 $data = ['Password' => $pass_random, 'user_email' => $email];
                 User::where('email', $email)->update([
@@ -112,7 +109,7 @@ class ChangePasswordController extends Controller
                 );
             }
             return $this->sendResponse(
-                'Password has sent to your Email',
+                'OTP has sent to your Email',
                 'Check Your Mail'
             );
         } catch (\Exception $e) {
@@ -130,6 +127,7 @@ class ChangePasswordController extends Controller
     public function change_password(Request $request)
     {
         $input = $request->all();
+
         $userid = Auth::guard('api')->user()->id;
         $rules = [
             'old_password' => 'required',
@@ -137,58 +135,33 @@ class ChangePasswordController extends Controller
         ];
         $validator = Validator::make($input, $rules);
         if ($validator->fails()) {
-            $arr = [
-                'status' => true,
-                'message' => $validator->errors()->first(),
-            ];
-        } else {
-            try {
-                if (
-                    Hash::check(
-                        request('old_password'),
-                        Auth::user()->password
-                    ) == false
-                ) {
-                    $arr = [
-                        'status' => false,
-                        'message' => 'Check your old password.',
-                    ];
-                } elseif (
-                    Hash::check(
-                        request('new_password'),
-                        Auth::user()->password
-                    ) == true
-                ) {
-                    $arr = [
-                        'status' => false,
-                        'message' =>
-                            'Please enter a password which is not similar then currunt password.',
-                    ];
-                } else {
-                    User::where('id', $userid)->update([
-                        'password' => Hash::make($input['new_password']),
-                    ]);
-                    return response()->json([
-                        'status' => true,
-                        'message' => 'Changed Password Successfully',
-                    ]);
-                }
-            } catch (\Exception $e) {
-                if (isset($e->errorInfo[2])) {
-                    $msg = $e->errorInfo[2];
-                } else {
-                    $msg = $e->getMessage();
-                }
-                $arr = ['status' => false, 'message' => $msg];
-                return response()->json([
-                    'status' => false,
-                    'message' => $arr,
-                ]);
-            }
+            return $this->sendError('Validation Error.', $validator->errors());
         }
-        return $this->sendError(
-            'You are not a register User so please Register or check your Credentials!!!.'
-        );
+        if (
+            Hash::check(request('old_password'), Auth::user()->password) ==
+            false
+        ) {
+            return $this->sendError('Unauthorised.', [
+                'error' => 'Old Password is not Match. Please Check Once!!!',
+            ]);
+        } elseif (
+            Hash::check(request('new_password'), Auth::user()->password) == true
+        ) {
+            return $this->sendError('Unauthorised.', [
+                'error' =>
+                    'Please enter a Password Which is not Similar then Current Password!!!',
+            ]);
+        } else {
+            User::where('id', $userid)->update([
+                'password' => Hash::make($input['new_password']),
+            ]);
+            $user = User::where('id', $userid)->first();
+            $success['email'] = $user['email'];
+            return $this->sendResponse(
+                'Password Change Successfully',
+                $success
+            );
+        }
     }
 
     public function otp_verify(Request $request)
