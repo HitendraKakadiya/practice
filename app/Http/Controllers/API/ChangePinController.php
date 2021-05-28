@@ -88,7 +88,6 @@ class ChangePinController extends Controller
             return $this->sendResponse('OTP Match Successfully.');
         } else {
             return $this->sendError(
-                'Error',
                 'OTP does not match or Expired. Please Check Again!!!'
             );
         }

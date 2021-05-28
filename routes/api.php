@@ -7,6 +7,7 @@ use App\Http\Controllers\API\ChangePasswordController;
 use App\Http\Controllers\StoreController;
 use App\Http\Controllers\CardShareController;
 use App\Http\Controllers\StoreCardController;
+use App\Http\Controllers\API\ContactUsController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -68,4 +69,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('OTP_Verify', 'API\ChangePinController@otp_verify');
     Route::post('Create_New_Pin', 'API\ChangePinController@create_new_pin');
     Route::post('Change_Pin', 'API\ChangePinController@change_pin');
+
+    Route::post('ContactUs', 'API\ContactUsController@contactus');
 });
