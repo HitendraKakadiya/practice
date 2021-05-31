@@ -66,7 +66,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('AddShareCard', 'CardShareController@add_share_card');
 
     Route::post('Forgot_Pin', 'API\ChangePinController@forgot_pin');
-    Route::post('OTP_Verify', 'API\ChangePinController@otp_verify');
+    Route::post('OTP_Verify_Pin', 'API\ChangePinController@otp_verify');
     Route::post('Create_New_Pin', 'API\ChangePinController@create_new_pin');
     Route::post('Change_Pin', 'API\ChangePinController@change_pin');
 
