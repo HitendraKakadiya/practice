@@ -47,6 +47,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('StoreDelete', 'StoreController@store_delete');
     Route::post('AddFavorite', 'StoreController@add_favorite');
     Route::post('RemoveFavorite', 'StoreController@remove_favorite');
+    Route::post('Filter', 'StoreController@filter');
 
     Route::post('StoreCard', 'StoreCardController@store_card');
     Route::post('CardDetail', 'StoreCardController@card_details');
@@ -71,4 +72,6 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('Change_Pin', 'API\ChangePinController@change_pin');
 
     Route::post('ContactUs', 'API\ContactUsController@contactus');
+
+    Route::post('FetchAll', 'CategoryController@fetchall');
 });

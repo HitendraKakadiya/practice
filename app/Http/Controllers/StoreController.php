@@ -224,4 +224,10 @@ class StoreController extends Controller
             ]
         );
     }
+
+    public function filter(Request $request)
+    {
+        $success = $request->all();
+        return $this->sendResponse('Successfull.', $success);
+    }
 }
