@@ -19,7 +19,7 @@ class StoreController extends Controller
                 'stlocation' => 'required',
                 'stcontact' => 'required|min:10|max:10',
                 'store_img' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
-                'category' => 'required',
+                'category_id' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -47,7 +47,7 @@ class StoreController extends Controller
             $success['stlocation'] = $user->stlocation;
             $success['stcontact'] = $user->stcontact;
             $success['Image'] = $user->store_img;
-            $success['category'] = $user->category;
+            $success['category_id'] = $user->category_id;
 
             return $this->sendResponse('Store Add Successfully', $success);
         } catch (\Exception $e) {
@@ -227,7 +227,25 @@ class StoreController extends Controller
 
     public function filter(Request $request)
     {
-        $success = $request->all();
-        return $this->sendResponse('Successfull.', $success);
+        $validator = Validator::make($request->all(), [
+            'filter_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Validator Error.', $validator->errors());
+        }
+        $data = $request->filter_id;
+        $ids = explode(',', $data);
+        $storedata = storedata::whereIn('category_id', $ids)->get();
+
+        if (!$storedata->isEmpty()) {
+            return $this->sendResponse(
+                'All the Store which you selected Category Wise are Here.',
+                $storedata
+            );
+        } else {
+            return $this->sendError(
+                'Store are not Available for Those Categories'
+            );
+        }
     }
 }
