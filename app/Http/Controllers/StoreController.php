@@ -19,6 +19,7 @@ class StoreController extends Controller
                 'stlocation' => 'required',
                 'stcontact' => 'required|min:10|max:10',
                 'store_img' => 'required|image|mimes:jpeg,png,jpg,gif,svg',
+                'category' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -46,6 +47,7 @@ class StoreController extends Controller
             $success['stlocation'] = $user->stlocation;
             $success['stcontact'] = $user->stcontact;
             $success['Image'] = $user->store_img;
+            $success['category'] = $user->category;
 
             return $this->sendResponse('Store Add Successfully', $success);
         } catch (\Exception $e) {
