@@ -141,26 +141,22 @@ class ChangePasswordController extends Controller
             Hash::check(request('old_password'), Auth::user()->password) ==
             false
         ) {
-            return $this->sendError('Unauthorised.', [
-                'error' => 'Old Password is not Match. Please Check Once!!!',
-            ]);
+            return $this->sendError(
+                'Old Password is not Match. Please Check Once!!!'
+            );
         } elseif (
             Hash::check(request('new_password'), Auth::user()->password) == true
         ) {
-            return $this->sendError('Unauthorised.', [
-                'error' =>
-                    'Please enter a Password Which is not Similar then Current Password!!!',
-            ]);
+            return $this->sendError(
+                'Please enter a Password Which is not Similar then Current Password!!!'
+            );
         } else {
             User::where('id', $userid)->update([
                 'password' => Hash::make($input['new_password']),
             ]);
             $user = User::where('id', $userid)->first();
             $success['email'] = $user['email'];
-            return $this->sendResponse(
-                'Password Change Successfully',
-                $success
-            );
+            return $this->sendResponse('Password Change Successfully');
         }
     }
 

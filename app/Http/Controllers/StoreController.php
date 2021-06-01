@@ -234,9 +234,12 @@ class StoreController extends Controller
         if ($validator->fails()) {
             return $this->sendError('Validator Error.', $validator->errors());
         }
+        $id = Auth::guard('api')->user()->id;
         $data = $request->filter_id;
         $ids = explode(',', $data);
-        $data = storedata::whereIn('category_id', $ids)->get();
+        $data = storedata::whereIn('category_id', $ids)
+            ->where('user_id', $id)
+            ->get();
         $storedata = StoreResource::collection($data);
 
         if (!$storedata->isEmpty()) {
