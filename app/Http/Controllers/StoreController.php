@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\storedata;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Resources\StoreResource;
 use Validator;
 use DB;
 use File;
@@ -235,7 +236,8 @@ class StoreController extends Controller
         }
         $data = $request->filter_id;
         $ids = explode(',', $data);
-        $storedata = storedata::whereIn('category_id', $ids)->get();
+        $data = storedata::whereIn('category_id', $ids)->get();
+        $storedata = StoreResource::collection($data);
 
         if (!$storedata->isEmpty()) {
             return $this->sendResponse(
