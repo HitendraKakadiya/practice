@@ -26,6 +26,7 @@ class storecard extends Model
         'card_img',
         'status',
         'isActive',
+        'is_Used',
     ];
 
     public function user()

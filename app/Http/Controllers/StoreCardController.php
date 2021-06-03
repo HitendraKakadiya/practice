@@ -88,7 +88,8 @@ class StoreCardController extends Controller
                     'carddetail',
                     'card_img',
                     'status',
-                    'isActive'
+                    'isActive',
+                    'is_Used'
                 )
                 ->where('user_id', $id)
                 ->where('st_id', $aa)
@@ -201,5 +202,30 @@ class StoreCardController extends Controller
                 'Error' => 'Operation Failed',
             ]
         );
+    }
+
+    public function card_disable(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'card_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->sendError('Validator Error.', $validator->errors());
+        }
+        $card_id = $request->card_id;
+        $card = storecard::where('id', $card_id)->first();
+        $cardno = $card['cardno'];
+        if ($card['is_Used'] == 'false') {
+            $card_update = storecard::where('cardno', $cardno)->update([
+                'is_Used' => 'true',
+            ]);
+        } else {
+            return $this->sendError('Card is Already Disabled!!!');
+        }
+        if ($card_update) {
+            return $this->sendResponse('Card Disable Successfully.');
+        } else {
+            return $this->sendError('Something want Wrong!!!');
+        }
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\storedata;
+use App\storecard;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Resources\StoreResource;
 use Validator;
@@ -124,6 +125,7 @@ class StoreController extends Controller
     public function store_delete(Request $request)
     {
         $id = $request->id;
+        $card = storecard::where('st_id', $id)->delete();
         $res = storedata::where('id', $id)->delete();
 
         if ($res) {

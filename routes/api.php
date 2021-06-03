@@ -54,6 +54,7 @@ Route::group(['middleware' => 'auth:api'], function () {
     Route::post('CardDelete', 'StoreCardController@card_delete');
     Route::post('HideCard', 'StoreCardController@hide_card');
     Route::post('ShowCard', 'StoreCardController@show_card');
+    Route::post('Card_Disable', 'StoreCardController@card_disable');
 
     Route::post('StoreSuggest', 'StoreSuggestionController@index');
 
