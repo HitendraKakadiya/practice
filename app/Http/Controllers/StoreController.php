@@ -291,4 +291,25 @@ class StoreController extends Controller
             );
         }
     }
+
+    public function fetch_favorite(Request $request)
+    {
+        $id = Auth::guard('api')->user()->id;
+        $favorite = DB::Table('storedatas')
+            ->select(
+                'id',
+                'stname',
+                'stlocation',
+                'stcontact',
+                'store_img',
+                'is_favorite'
+            )
+            ->where('user_id', $id)
+            ->where('is_favorite', 'true')
+            ->orderBy('stname')
+            ->get();
+        $success = $favorite;
+        return $this->sendResponse('List of Favorite Stores', $success);
+
+    }
 }
