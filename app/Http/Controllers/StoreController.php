@@ -277,7 +277,10 @@ class StoreController extends Controller
             'stcontact' => $contact,
             'stlocation' => $location
             ]);
-        $success = storedata::where('id', $id)->first();
+            $success['id'] = $id;
+        $success['stcontact'] = $contact;
+        $success['stlocation'] = $location;
+        
         if($update)
         {
             return $this->sendResponse('Store Update Successfully', $success);
