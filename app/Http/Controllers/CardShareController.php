@@ -107,6 +107,7 @@ class CardShareController extends Controller
         if (!empty($card)) {
             if (!empty($store)) {
                 if (empty($available)) {
+                    
                     $data = storecard::create([
                         'user_id' => $user_id,
                         'st_id' => $store['id'],
@@ -134,12 +135,38 @@ class CardShareController extends Controller
                 $fail['cardno'] = $available['cardno'];
                 return $this->sendError('Card is Already Exist', $fail);
             }
-            return $this->sendError(
-                'Store ' .
-                    $storedata['stname'] .
-                    ' is Not Available in your account. Please first Add the Store.',
-                ['Error' => 'Operation Failed']
-            );
+            // dd($storedata);
+            $input['user_id'] = $user_id;
+            $input['stname'] = $storedata['stname'];
+            $input['stlocation'] = $storedata['stlocation'];
+            $input['stcontact'] = $storedata['stcontact'];
+            $input['store_img'] = $storedata['store_img'];
+            $input['category_id'] = $storedata['category_id'];
+            $input['is_favorite'] = $storedata['is_favorite'];
+            $user = storedata::create($input);
+            $store = stordata::where('id', $user['id'])->first();
+            $data = storecard::create([
+                        'user_id' => $user_id,
+                        'st_id' => $store['id'],
+                        'cardname' => $card_data['cardname'],
+                        'cardno' => $card_data['cardno'],
+                        'rewardpercen' => $card_data['rewardpercen'],
+                        'carddetail' => $card_data['carddetail'],
+                        'expdate' => $card_data['expdate'],
+                        'card_img' => $card_data['card_img'],
+                    ]);
+                    $success['st_id'] = $data['st_id'];
+                    $success['cardname'] = $data['cardname'];
+                    $success['cardno'] = $data['cardno'];
+                    $success['rewardpercen'] = $data['rewardpercen'];
+                    $success['carddetail'] = $data['carddetail'];
+                    $success['expdate'] = $data['expdate'];
+                    $success['card_img'] = $data['card_img'];
+
+                    return $this->sendResponse(
+                        'Shared Card Added Successfully with Store.',
+                        $success
+                    );
         }
         return $this->sendError(
             'Share Code ' .
