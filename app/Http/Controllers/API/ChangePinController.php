@@ -77,7 +77,7 @@ class ChangePinController extends Controller
         if ($validator->fails()) {
             return $this->sendError('Validation Error', $validator->errors());
         }
-s
+        
         $otp = $request->pin_otp;
         $email = Auth::guard('api')->user()->email;
 
