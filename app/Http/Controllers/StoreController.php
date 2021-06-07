@@ -255,4 +255,37 @@ class StoreController extends Controller
             );
         }
     }
+
+    public function store_update(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+                'id' => 'required',
+                'location' => 'required',
+                'contact' => 'required|min:10|max:10',
+            ]);
+
+            if ($validator->fails()) {
+                return $this->sendError(
+                    'Validator Error.',
+                    $validator->errors()
+                );
+            }
+        $contact = $request->contact;
+        $location = $request->location;
+        $id = $request->id;
+        $update = storedata::where('id', $id)->update([
+            'stcontact' => $contact,
+            'stlocation' => $location
+            ]);
+        $success = storedata::where('id', $id)->first();
+        if($update)
+        {
+            return $this->sendResponse('Store Update Successfully', $success);
+        }
+        else{
+            return $this->sendError(
+                'Store Not Update. Something wamt Wrong!!!'
+            );
+        }
+    }
 }
