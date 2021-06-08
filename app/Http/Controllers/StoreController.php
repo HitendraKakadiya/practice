@@ -72,27 +72,11 @@ class StoreController extends Controller
                     'is_favorite'
                 )
                 ->where('user_id', $id)
-                ->where('is_favorite', 'true')
                 ->orderBy('stname')
                 ->get();
 
-            $un_favorite = DB::Table('storedatas')
-                ->select(
-                    'id',
-                    'stname',
-                    'stlocation',
-                    'stcontact',
-                    'store_img',
-                    'is_favorite'
-                )
-                ->where('user_id', $id)
-                ->where('is_favorite', 'false')
-                ->orderBy('stname')
-                ->get();
-            $merged = $favorite->merge($un_favorite);
-            $user = $merged->all();
 
-            return $this->sendResponse('List of Stores', $user);
+            return $this->sendResponse('List of Stores', $favorite);
         } catch (\Exception $e) {
             return $this->sendError('Error', $e->getMessage());
         }
