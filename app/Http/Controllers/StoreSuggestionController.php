@@ -12,9 +12,10 @@ class StoreSuggestionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $store = storedata::all(
+        $category = $request->category_id;
+        $store = storedata::where('category_id', $category)->get(
             'stname',
             'store_img',
             'stlocation',

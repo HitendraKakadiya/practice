@@ -69,12 +69,12 @@ class StoreController extends Controller
                     'stlocation',
                     'stcontact',
                     'store_img',
-                    'is_favorite'
+                    'is_favorite',
+                    'category_id'
                 )
                 ->where('user_id', $id)
                 ->orderBy('stname')
                 ->get();
-
 
             return $this->sendResponse('List of Stores', $favorite);
         } catch (\Exception $e) {
@@ -94,6 +94,7 @@ class StoreController extends Controller
                     'user_id',
                     'stlocation',
                     'stcontact',
+                    'store_img',
                     'is_favorite'
                 )
                 ->where('user_id', $id)
